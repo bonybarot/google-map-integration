@@ -22,7 +22,7 @@ const Splash = ({ navigation }: INavigation) => {
     try {
       let asyncData = await initialStorageValueGet();
       if (asyncData) {
-        let { themeColor, onBoardingValue, loggedIn, logInCred } = asyncData;
+        let { themeColor, loggedIn, logInCred } = asyncData;
         if (logInCred) {
           dispatch(setDefaultEmailPassword(logInCred));
         }
@@ -34,28 +34,25 @@ const Splash = ({ navigation }: INavigation) => {
             dispatch(changeThemeAction(colors.dark));
           }
         }
-        if (onBoardingValue) {
-          if (loggedIn) {
-            const { payload } = await dispatch(whoAmI());
-            if (payload.status) {
-              dispatch(socketActions.startConnecting());
-              navigation.reset({
-                index: 0,
-                routes: [
-                  {
-                    name: SCREENS.Drawer,
-                  },
-                ],
-              });
-            } else {
-              navigation.navigate(SCREENS.LocationTesting);
-            }
+        if (loggedIn) {
+          const { payload } = await dispatch(whoAmI());
+          if (payload.status) {
+            dispatch(socketActions.startConnecting());
+            navigation.reset({
+              index: 0,
+              routes: [
+                {
+                  name: SCREENS.Drawer,
+                },
+              ],
+            });
           } else {
-            navigation.navigate(SCREENS.Drawer);
+            navigation.navigate(SCREENS.LocationTesting);
           }
         } else {
-          navigation.navigate(SCREENS.onBoarding);
+          navigation.navigate(SCREENS.Drawer);
         }
+
       } else {
         navigation.navigate(SCREENS.onBoarding);
       }

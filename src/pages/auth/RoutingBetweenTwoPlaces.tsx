@@ -1,23 +1,32 @@
 import EHeader from '@commonComponents/EHeader';
+import EText from '@commonComponents/EText';
 import { AgentIcon, CallOutText } from '@commonComponents/MapIcons';
 import { INavigation } from '@interfaces/common';
 import { useRoute } from '@react-navigation/native';
 import { mapKey } from '@utils/constant';
-import React from 'react';
-import { View } from 'react-native';
+import React, { useState } from 'react';
+import { Text, View } from 'react-native';
 import MapView, { Callout, Marker, PROVIDER_GOOGLE } from 'react-native-maps'; // remove PROVIDER_GOOGLE import if not using Google Maps
 import MapViewDirections from 'react-native-maps-directions';
 
 const RoutingBetweenTwoPlaces = ({ navigation }: INavigation) => {
     const route = useRoute()
     const { SelectedPlaces } = route?.params
+    const [distance, setDistance] = useState()
+    const [time, setTime] = useState()
     const origin = { latitude: SelectedPlaces?.latitude1, longitude: SelectedPlaces?.longitude1 };
     const destination = { latitude: SelectedPlaces?.latitude2, longitude: SelectedPlaces?.longitude2 };
     // const origin = { latitude: "23.04688005066613", longitude: "72.56997585296632" };
     // const destination = { latitude: "23.04555712751455", longitude: "72.561993598938" };
+    const hours = Math.floor(time / 60);
+    const minutes = time % 60;
     return (
         <View style={{ flex: 1 }}>
             <EHeader title='map' />
+            <View style={{ alignItems: "center" }}>
+                <EText>Distance : {distance} KM</EText>
+                <EText>Time: {hours} hours {minutes.toFixed(0)} minutes</EText>
+            </View>
             <MapView
                 // ref={mapRef}
                 mapType="hybrid"
@@ -68,6 +77,12 @@ const RoutingBetweenTwoPlaces = ({ navigation }: INavigation) => {
                     apikey={mapKey}
                     strokeWidth={3}
                     strokeColor="blue"
+                    onReady={Result => {
+                        console.log("Result.distance.toFixed(2)", Result.duration.toFixed(2))
+                        setDistance(Result.distance.toFixed(2));
+                        setTime(Result.duration.toFixed(2))
+                    }
+                    }
                 />
                 <Marker
                     coordinate={{

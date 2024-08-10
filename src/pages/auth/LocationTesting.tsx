@@ -8,9 +8,41 @@ import { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { PermissionsAndroid, ScrollView, View } from 'react-native';
 import GetLocation from 'react-native-get-location';
+import Toast from 'react-native-toast-message';
+import { isMockingLocation, MockLocationDetectorErrorCode, MockLocationDetectorError } from 'react-native-turbo-mock-location-detector'
 
 const LocationTesting = ({ navigation }: INavigation) => {
   const { control, handleSubmit, setValue } = useForm({});
+
+  const MockLocationCheck = () => {
+    isMockingLocation()
+      .then(({ isLocationMocked }: any) => {
+        if (isLocationMocked) {
+          Toast.show({ type: 'error', text1: 'Mock Location Detected' });
+        } else {
+
+          Toast.show({ type: 'success', text1: 'No Mock Location Detected' });
+
+        }
+      })
+      .catch((error: MockLocationDetectorError) => {
+        // error.message - descriptive message
+        switch (error.code) {
+          case MockLocationDetectorErrorCode.GPSNotEnabled: {
+            Toast.show({ type: 'error', text1: 'GPS Not Enabled' });
+          }
+          case MockLocationDetectorErrorCode.NoLocationPermissionEnabled: {
+            // user has no permission to access location
+            Toast.show({ type: 'error', text1: 'No Location Permission Enabled' });
+          }
+          case MockLocationDetectorErrorCode.CantDetermine: {
+            // always for iOS < 15.0
+            // for android and iOS if couldn't fetch GPS position
+            Toast.show({ type: 'error', text1: 'Can not Determine' });
+          }
+        }
+      })
+  }
 
   const onLocationChange = (location: any) => {
     setValue('latitude', location.geometry.location.lat);
@@ -124,6 +156,7 @@ const LocationTesting = ({ navigation }: INavigation) => {
           onValueChange={onLocationChange3}
         />
         <EButton title='Locate To The Place' onPress={handleSubmit(onLocateToPlace, onError)} />
+        <EButton title='Check Mock Location' onPress={() => MockLocationCheck()} />
       </ScrollView>
     </View>
   );

@@ -23,9 +23,9 @@ const BackgroundTesting = () => {
         console.log("function called")
         const locationGranted = await requestLocationPermission()
         const backgroundGranted = await RequestBackgroundLocation()
-        console.log("locationGranted", locationGranted, "-backgroundGranted----", backgroundGranted);
+        // console.log("locationGranted", locationGranted, "-backgroundGranted----", backgroundGranted);
         if (locationGranted && backgroundGranted) {
-            console.log("ReactNativeForegroundService-----", ReactNativeForegroundService.stop({ id: 144 }))
+            // console.log("ReactNativeForegroundService-----", ReactNativeForegroundService.stop({ id: 144 }))
             ReactNativeForegroundService.add_task(
                 async () => {
                     try {
@@ -79,7 +79,6 @@ const BackgroundTesting = () => {
     useEffect(() => {
         requestBackgroundPermission();
     }, []);
-
     const handleUpdateRegion = () => {
         if (currentLocation) {
             setRegion({
@@ -90,7 +89,9 @@ const BackgroundTesting = () => {
             });
         }
     };
-
+    useEffect(() => {
+        handleUpdateRegion()
+    }, []);
     return (
         <View style={{ flex: 1 }}>
             <Text>Background Location Testing</Text>
@@ -102,21 +103,24 @@ const BackgroundTesting = () => {
                     style={{ flex: 1 }}
                     region={region}
                 >
-                    <Marker
-                        coordinate={{
-                            latitude: currentLocation?.latitude,
-                            longitude: currentLocation?.longitude,
-                            // latitude: currentLocation?.latitude ?? "37.4220936",
-                            // longitude: currentLocation?.longitude ?? "-122.083922",
-                        }}
-                        title='My Location'
-                        description='I am here'
-                    >
-                        <AgentIcon />
-                        <Callout style={{ height: 100, width: 200, borderWidth: 1 }}>
-                            <CallOutText title={"this is my call out text"} />
-                        </Callout>
-                    </Marker>
+                    {currentLocation && (
+                        <Marker
+                            // coordinate={region}
+                            coordinate={{
+                                latitude: currentLocation?.latitude,
+                                longitude: currentLocation?.longitude,
+                                // latitude: currentLocation?.latitude ?? "37.4220936",
+                                // longitude: currentLocation?.longitude ?? "-122.083922",
+
+                            }}
+                            title='My Location'
+                            description='I am here'
+                        >
+                            <AgentIcon />
+                            <Callout style={{ height: 100, width: 200, borderWidth: 1 }}>
+                                <CallOutText title={"this is my call out text"} />
+                            </Callout>
+                        </Marker>)}
                 </MapView>
                 {/* Button to update the map region */}
                 <TouchableOpacity
